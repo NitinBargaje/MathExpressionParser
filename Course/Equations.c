@@ -4,105 +4,90 @@
 #include "MexprEnums.h"
 #include <cstring>
 
+
+#define PARSER_LOG_ERROR(token_obtained, token_expected) \
+    printf("%s(%d): Token obtained = %d(%s), expected token = %d\n", \
+    __FUNCTION__, __LINE__, token_obtatined, lex_curr_token, expected_token);
 // pow(x,2) + pow(y,2) = <CONSTANT>
-static bool circle_eqn() {
-    int token_code;
+parse_rc_t circle_eqn() {
+    parse_init();
+
     token_code = cyylex();
     if(token_code != MATH_POW) {
-        yyrewind(1);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_BRACKET_START) {
-        yyrewind(2);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_IDENTIFIER) {
-        yyrewind(3);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     if(strcmp(lex_curr_token, "x") != 0) {
-        yyrewind(3);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_COMMA) {
-        yyrewind(4);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_INTEGER_VALUE) {
-        yyrewind(5);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     if(strcmp(lex_curr_token, "2") != 0) {
-        yyrewind(5);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_BRACKET_END) {
-        yyrewind(6);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_PLUS) {
-        yyrewind(7);
-        return false;
+        RETURN_PARSE_ERROR;
     }
 
     token_code = cyylex();
     if(token_code != MATH_POW) {
-        yyrewind(8);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_BRACKET_START) {
-        yyrewind(9);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_IDENTIFIER) {
-        yyrewind(10);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     if(strcmp(lex_curr_token, "y") != 0) {
-        yyrewind(10);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_COMMA) {
-        yyrewind(11);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_INTEGER_VALUE) {
-        yyrewind(12);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     if(strcmp(lex_curr_token, "2") != 0) {
-        yyrewind(12);
-        return false;
+        RETURN_PARSE_ERROR;
     }
     token_code = cyylex();
     if(token_code != MATH_BRACKET_END) {
-        yyrewind(13);
-        return false;
+        RETURN_PARSE_ERROR;
     }
 
     token_code = cyylex();
     if(token_code != MATH_EQ) {
-        yyrewind(14);
-        return false;
+        RETURN_PARSE_ERROR;
     }
 
     token_code = cyylex();
     if(token_code != MATH_INTEGER_VALUE && token_code != MATH_DOUBLE_VALUE) {
-        yyrewind(15);
-        return false;
+        RETURN_PARSE_ERROR;
     }
-
-    return true;
+    RETURN_PARSE_SUCCESS;
 }
 
 static bool ellipse_eqn() {

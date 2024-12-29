@@ -1,7 +1,6 @@
 %{
     // Write all the supporting C - code declarations/definitions
     #include "ParserExport.h"
-    #include <cassert>
 
     char lex_buffer[MAX_STRING_SIZE];
     stack_t undo_stack = {-1, {0, 0, 0}};
@@ -72,7 +71,7 @@
         lex_push(data);
         return token_code;
     }
-    
+
     void yyrewind(int n) {
         if(n <= 0) return;
         if(curr_ptr == lex_buffer) return;
@@ -89,6 +88,28 @@
             lex_data.token_len = 0;
         }
         curr_ptr -= data_len;
+    }
+
+       void RESTORE_CHKP(int a) {
+        lex_data_t lex_data;
+        int data_len = 0;
+        while(undo_stack.top > a) {
+            lex_data = lex_pop();
+            data_len += lex_data.token_len;
+
+            if(lex_data.token_val) {
+                free (lex_data.token_val);
+                lex_data.token_val = NULL;
+            }
+        }
+        curr_ptr -= data_len;
+        yy_scan_string(curr_ptr);
+
+        if(undo_stack.top > 0) {
+            lex_data = undo_stack.data[undo_stack.top];
+            lex_curr_token = lex_data.token_val;
+            lex_curr_token_len = lex_data.token_len;
+        }
     }
 
     // dedicated to decalre all global variables which parser will use END

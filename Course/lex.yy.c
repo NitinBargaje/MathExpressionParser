@@ -497,7 +497,6 @@ char *yytext;
 #line 2 "Parser.l"
     // Write all the supporting C - code declarations/definitions
     #include "ParserExport.h"
-    #include <cassert>
 
     char lex_buffer[MAX_STRING_SIZE];
     stack_t undo_stack = {-1, {0, 0, 0}};
@@ -568,7 +567,7 @@ char *yytext;
         lex_push(data);
         return token_code;
     }
-    
+
     void yyrewind(int n) {
         if(n <= 0) return;
         if(curr_ptr == lex_buffer) return;
@@ -587,11 +586,33 @@ char *yytext;
         curr_ptr -= data_len;
     }
 
+       void RESTORE_CHKP(int a) {
+        lex_data_t lex_data;
+        int data_len = 0;
+        while(undo_stack.top > a) {
+            lex_data = lex_pop();
+            data_len += lex_data.token_len;
+
+            if(lex_data.token_val) {
+                free (lex_data.token_val);
+                lex_data.token_val = NULL;
+            }
+        }
+        curr_ptr -= data_len;
+        yy_scan_string(curr_ptr);
+
+        if(undo_stack.top > 0) {
+            lex_data = undo_stack.data[undo_stack.top];
+            lex_curr_token = lex_data.token_val;
+            lex_curr_token_len = lex_data.token_len;
+        }
+    }
+
     // dedicated to decalre all global variables which parser will use END
 
     #include "MexprEnums.h"
-#line 594 "lex.yy.c"
-#line 595 "lex.yy.c"
+#line 615 "lex.yy.c"
+#line 616 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -808,9 +829,9 @@ YY_DECL
 		}
 
 	{
-#line 99 "Parser.l"
+#line 120 "Parser.l"
 
-#line 814 "lex.yy.c"
+#line 835 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -869,147 +890,147 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 100 "Parser.l"
+#line 121 "Parser.l"
 {
     return MATH_BRACKET_START;
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 104 "Parser.l"
+#line 125 "Parser.l"
 {
     return MATH_BRACKET_END;
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 108 "Parser.l"
+#line 129 "Parser.l"
 {
     return MATH_LESS_THAN_EQ;
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 112 "Parser.l"
+#line 133 "Parser.l"
 {
     return MATH_LESS_THAN;
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 116 "Parser.l"
+#line 137 "Parser.l"
 {
     return MATH_GREATER_THAN;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 120 "Parser.l"
+#line 141 "Parser.l"
 {
     return MATH_EQ;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 124 "Parser.l"
+#line 145 "Parser.l"
 {
     return MATH_NOT_EQ;
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 128 "Parser.l"
+#line 149 "Parser.l"
 {
     return MATH_AND;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 132 "Parser.l"
+#line 153 "Parser.l"
 {
     return MATH_OR;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 136 "Parser.l"
+#line 157 "Parser.l"
 {
     return MATH_MUL;
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 140 "Parser.l"
+#line 161 "Parser.l"
 {
     return MATH_PLUS;
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 144 "Parser.l"
+#line 165 "Parser.l"
 {
     return  MATH_MINUS;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 148 "Parser.l"
+#line 169 "Parser.l"
 {
     return MATH_DIV;
 }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 152 "Parser.l"
+#line 173 "Parser.l"
 {
     return MATH_COMMA;
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 156 "Parser.l"
+#line 177 "Parser.l"
 {
     return MATH_SQRT;
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 160 "Parser.l"
+#line 181 "Parser.l"
 {
     return MATH_SQR;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 164 "Parser.l"
+#line 185 "Parser.l"
 {
     return MATH_MAX;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 168 "Parser.l"
+#line 189 "Parser.l"
 {
     return MATH_MIN;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 172 "Parser.l"
+#line 193 "Parser.l"
 {
     return MATH_SIN;
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 176 "Parser.l"
+#line 197 "Parser.l"
 {
     return MATH_COS;
 }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 180 "Parser.l"
+#line 201 "Parser.l"
 {
     return MATH_POW;
 }
@@ -1017,7 +1038,7 @@ YY_RULE_SETUP
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 184 "Parser.l"
+#line 205 "Parser.l"
 {
     return PARSER_EOL;
 }
@@ -1025,14 +1046,14 @@ YY_RULE_SETUP
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 188 "Parser.l"
+#line 209 "Parser.l"
 {
 
 }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 192 "Parser.l"
+#line 213 "Parser.l"
 {
     /* Ignore */
     process_white_space(1);
@@ -1040,7 +1061,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 197 "Parser.l"
+#line 218 "Parser.l"
 {
     /*ignore*/
     process_white_space(4);
@@ -1048,35 +1069,35 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 202 "Parser.l"
+#line 223 "Parser.l"
 {
     return PARSER_QUIT;
 }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 206 "Parser.l"
+#line 227 "Parser.l"
 {
     return MATH_INTEGER_VALUE;
 }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 210 "Parser.l"
+#line 231 "Parser.l"
 {
     return MATH_DOUBLE_VALUE;
 }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 214 "Parser.l"
+#line 235 "Parser.l"
 {
     return MATH_IDENTIFIER;
 }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 218 "Parser.l"
+#line 239 "Parser.l"
 {
     return MATH_IDENTIFIER_IDENTIFIER;
 }
@@ -1084,7 +1105,7 @@ YY_RULE_SETUP
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 222 "Parser.l"
+#line 243 "Parser.l"
 {
     // string enclosed within single quotes
     return MATH_STRING_VALUE;
@@ -1093,7 +1114,7 @@ YY_RULE_SETUP
 case 32:
 /* rule 32 can match eol */
 YY_RULE_SETUP
-#line 227 "Parser.l"
+#line 248 "Parser.l"
 {
     // string enclosed within double quotes
     return MATH_STRING_VALUE;
@@ -1101,17 +1122,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 233 "Parser.l"
+#line 254 "Parser.l"
 {
     // ignore any other character
 }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 237 "Parser.l"
+#line 258 "Parser.l"
 ECHO;
 	YY_BREAK
-#line 1115 "lex.yy.c"
+#line 1136 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2116,7 +2137,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 237 "Parser.l"
+#line 258 "Parser.l"
 
 
 // C main function
