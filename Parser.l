@@ -10,10 +10,8 @@
 
 #include "ParserExport.h"
 
-char lex_buffer[MAX_STRING_SIZE] = {0};
-char *curr_ptr = lex_buffer;
-char *lex_curr_token;
-int lex_curr_token_len;
+unsigned char lex_buffer[MAX_STRING_SIZE] = {0};
+unsigned char *curr_ptr = lex_buffer;
 
 stack_t undo_stack = {-1, {0, 0, 0}};
 
@@ -21,8 +19,6 @@ void
 lex_push(lex_data_t lex_data) {
     assert (undo_stack.top < MAX_MEXPR_LEN -1);
     undo_stack.data[++undo_stack.top] = lex_data;
-    lex_curr_token = (char *)lex_data.token_val;
-    lex_curr_token_len = lex_data.token_len;
 }
 
 lex_data_t
@@ -30,15 +26,6 @@ lex_pop() {
     assert (undo_stack.top > -1);
     lex_data_t res = undo_stack.data[undo_stack.top] ;
     undo_stack.top--;
-    if (undo_stack.top > -1) {
-        lex_data_t stck_top_lexd = undo_stack.data[undo_stack.top] ;
-        lex_curr_token = (char *)stck_top_lexd.token_val;
-        lex_curr_token_len = stck_top_lexd.token_len;
-    }
-    else {
-        lex_curr_token = NULL;
-        lex_curr_token_len = 0;
-    }
     return res;
 }
 
@@ -52,33 +39,10 @@ yyrewind (int n) {
     while (n)  {
         lex_data = lex_pop();
         data_len += lex_data.token_len;
-        if (lex_data.token_code == PARSER_WHITE_SPACE) {
-            continue;
-        }
         n--;
         lex_data.token_code = 0;
         lex_data.token_len = 0;
         if (lex_data.token_val) {
-            free (lex_data.token_val);
-            lex_data.token_val = NULL;
-        }
-    }
-    curr_ptr -= data_len;
-    yy_scan_string(curr_ptr);
-}
-
-void
-RESTORE_CHKP(int a) {
-
-    lex_data_t lex_data;
-    int data_len = 0;
-
-    while (undo_stack.top > a) {
-        
-        lex_data =  lex_pop();
-        data_len += lex_data.token_len;
-
-        if (lex_data.token_val) { 
             free (lex_data.token_val);
             lex_data.token_val = NULL;
         }
@@ -173,7 +137,7 @@ lex_set_scan_buffer (const char *buffer) {
 
 
 /* User specific header files */
-#include "MExprcppEnums.h"
+#include "MexprEnums.h"
 
 
 %}
@@ -181,87 +145,87 @@ lex_set_scan_buffer (const char *buffer) {
 %%
 
 "(" {
-    return MATH_CPP_BRACKET_START;
+    return MATH_BRACKET_START;
 }
 
 ")" {
-    return MATH_CPP_BRACKET_END;
+    return MATH_BRACKET_END;
 }
 
 "<=" {
-    return MATH_CPP_LESS_THAN_EQ;
+    return MATH_LESS_THAN_EQ;
 }
 
 "<" {
-    return MATH_CPP_LESS_THAN;
+    return MATH_LESS_THAN;
 }
 
 ">" {
-    return MATH_CPP_GREATER_THAN;
+    return MATH_GREATER_THAN;
 }
 
 "=" {
-    return MATH_CPP_EQ;
+    return MATH_EQ;
 }
 
 "!=" {
-    return MATH_CPP_NEQ;
+    return MATH_NOT_EQ;
 }
 
 "and" {
-    return MATH_CPP_AND;
+    return MATH_AND;
 }
 
 "or" {
-    return MATH_CPP_OR;
+    return MATH_OR;
 }
 
 "*" {
-    return MATH_CPP_MUL;
+    return MATH_MUL;
 }
 
 "+" {
-    return MATH_CPP_PLUS;
+    return MATH_PLUS;
 }
 
 "-" {
-    return  MATH_CPP_MINUS;
+    return  MATH_MINUS;
 }
 
 "/" {
-    return MATH_CPP_DIV;
+    return MATH_DIV;
 }
 
 "," {
-    return MATH_CPP_COMMA;
+    return MATH_COMMA;
 }
 
 "sqrt" {
-    return MATH_CPP_SQRT;
+    return MATH_SQRT;
 }
 
 "sqr" {
-    return MATH_CPP_SQR;
+    return MATH_SQR;
 }
 
 "mmax" {
-    return MATH_CPP_MAX;
+    return MATH_MAX;
 }
 
 "mmin" {
-    return MATH_CPP_MIN;
+    return MATH_MIN;
 }
 
 "sin" {
-    return MATH_CPP_SIN;
+    return MATH_SIN;
 }
 
 "cos" {
-    return MATH_CPP_COS;
+    return MATH_COS;
 }
 
 "pow" {
-    return MATH_CPP_POW;
+    return MATH_POW;
 }
 
 \n {
@@ -287,29 +251,29 @@ lex_set_scan_buffer (const char *buffer) {
 }
 
 0|-?[1-9][0-9]* {
-    return MATH_CPP_INT;
+    return MATH_INTEGER_VALUE;
 }
 
 -?[0-9]*\.[0-9]+ {
-    return MATH_CPP_DOUBLE;
+    return MATH_DOUBLE_VALUE;
 }
 
 [a-zA-Z0-9_]+ {
-    return MATH_CPP_VARIABLE;
+    return MATH_IDENTIFIER;
 }
 
 [a-zA-Z0-9_]+\.[a-zA-Z0-9_]+ {
-    return MATH_CPP_VARIABLE;
+    return MATH_IDENTIFIER_IDENTIFIER;
 }
 
 '[^']*' {
     // string enclosed within single quotes
-    return MATH_CPP_STRING;
+    return MATH_STRING_VALUE;
 }
 
 \"[^"]*\" {
     // string enclosed within double quotes
-    return MATH_CPP_STRING;
+    return MATH_STRING_VALUE;
 }
 
 

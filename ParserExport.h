@@ -29,11 +29,8 @@ typedef struct stack_ {
     lex_data_t data[MAX_MEXPR_LEN];
 } stack_t;
 
-extern char lex_buffer[MAX_STRING_SIZE];
-extern char *curr_ptr ;
-extern char *lex_curr_token;
-extern int lex_curr_token_len;
-
+extern unsigned char lex_buffer[MAX_STRING_SIZE];
+extern unsigned char *curr_ptr ;
 extern stack_t undo_stack;
 extern void lex_push(lex_data_t lex_data);
 extern lex_data_t lex_pop() ;
@@ -41,7 +38,6 @@ extern void yyrewind (int n) ;
 extern unsigned char *parser_alloc_token_value_default (uint16_t token_id);
 extern int cyylex ();
 extern void process_white_space(int n) ;
-extern void RESTORE_CHKP(int a);
 
 #define parse_init()             \
     int token_code = 0;          \
@@ -49,7 +45,7 @@ extern void RESTORE_CHKP(int a);
     parse_rc_t err = PARSE_SUCCESS
 
 #define RETURN_PARSE_ERROR      \
-    {RESTORE_CHKP(_lchkp);     \
+    {yyrewind(undo_stack.top - _lchkp);     \
     return PARSE_ERR;}
 
 #define RETURN_PARSE_SUCCESS    \
@@ -61,6 +57,9 @@ extern void RESTORE_CHKP(int a);
 #define CHECKPOINT(a)    \
     a = undo_stack.top
 
+#define RESTORE_CHKP(a) \
+    yyrewind(undo_stack.top - a)
+    
 #define CHECK_FOR_EOL                \
     {token_code = cyylex();                   \
     if (token_code == EOL) {                \
